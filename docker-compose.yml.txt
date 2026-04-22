@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: tool71-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: tool71
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tool71-redis
+    ports:
+      - "6379:6379"
