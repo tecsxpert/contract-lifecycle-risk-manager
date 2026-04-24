@@ -1,9 +1,11 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/tool71}
-    username: ${DB_USERNAME:postgres}
+    # Uses placeholders for DB as per Day 1 requirements
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:tool71}
+    username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -11,18 +13,41 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  # This must be indented exactly like 'datasource' and 'jpa'
+
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
 
-jwt:
-  secret: ${JWT_SECRET:your_super_secret_development_key_change_in_production}
+  # REQUIRED: Redis config for Day 6 & Day 7 tasks
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
+  # REQUIRED: Mail config for Day 7 (Today's task)
+  mail:
+    host: ${MAIL_HOST:sandbox.smtp.mailtrap.io}
+    port: ${MAIL_PORT:2525}
+    username: ${MAIL_USER:your_user}
+    password: ${MAIL_PASSWORD:your_pass}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# MOVED OUT of spring: block
+jwt:
+  # Standardized to lowercase to match typical @Value("${jwt.secret}")
+  secret: ${JWT_SECRET:638E1AF29432364B39527D6A4C1FE251DE9E5C19A627D6A4C1FE251DE9E5C19}
+  expiration: ${JWT_EXPIRATION:3600000}
+
+# MOVED OUT of spring: block
 server:
   port: 8080
   error:
     whitelabel:
-      enabled: false  # Disables the default Spring error page
-    include-stacktrace: never # Ensures no leaked code details in the API
+      enabled: false
+    include-stacktrace: never
