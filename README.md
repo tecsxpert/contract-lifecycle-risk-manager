@@ -37,3 +37,8 @@ To ensure the reliability of the **Contract Lifecycle Risk Manager**, the backen
   ```powershell
   cd backend
   .\mvnw.cmd clean test
+
+### **Day 11 Technical Milestone: Sign-off Ready**
+![Service Coverage Report](./assets/coverage-report.png)
+
+* **Service Layer Coverage**: Achieved **100% Branch and Line coverage**...
