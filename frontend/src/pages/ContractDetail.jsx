@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import AIPanel from "../components/AIPanel";
 
 function ContractDetail() {
   const { id } = useParams();
@@ -24,7 +25,6 @@ function ContractDetail() {
 
       <p>Status: {contract.status}</p>
 
-      {/* SCORE BADGE */}
       <span className="bg-purple-500 text-white px-2 py-1">
         Risk: {contract.risk_level}
       </span>
@@ -40,6 +40,7 @@ function ContractDetail() {
           Delete
         </button>
       </div>
+      <AIPanel />
     </div>
   );
 }
