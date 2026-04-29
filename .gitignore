@@ -1,0 +1,10 @@
+.env
+target/
+node_modules/
+__pycache/
+.idea/
+.vscode/
+*.class
+.mvn/
+mvnw
+mvnw.cmd
