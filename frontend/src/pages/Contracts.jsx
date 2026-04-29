@@ -42,6 +42,7 @@ function Contracts() {
       console.error(err);
     }
   };
+
   const handleDelete = async (id) => {
     try {
       await api.delete(`/contracts/${id}`, {
@@ -60,6 +61,12 @@ function Contracts() {
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Contracts</h1>
+
+      <Link to="/dashboard">
+        <button className="bg-purple-500 text-white px-4 py-2 mr-2 mb-4">
+          Go to Dashboard
+        </button>
+      </Link>
 
       <Link to="/create">
         <button className="bg-blue-500 text-white px-4 py-2 mb-4">
@@ -83,11 +90,10 @@ function Contracts() {
         </button>
       </div>
 
-  
       {contracts.length === 0 ? (
         <p>No contracts found</p>
       ) : (
-      <>
+        <>
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-200">
@@ -101,7 +107,16 @@ function Contracts() {
             <tbody>
               {contracts.map((c) => (
                 <tr key={c.id}>
-                  <td className="p-2 border">{c.title}</td>
+                  {/* 🔹 CLICKABLE TITLE → DETAIL PAGE */}
+                  <td className="p-2 border">
+                    <Link
+                      to={`/contracts/${c.id}`}
+                      className="text-blue-600 underline"
+                    >
+                      {c.title}
+                    </Link>
+                  </td>
+
                   <td className="p-2 border">{c.status}</td>
                   <td className="p-2 border">{c.risk_level}</td>
 
