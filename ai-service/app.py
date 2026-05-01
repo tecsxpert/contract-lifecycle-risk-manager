@@ -1,14 +1,31 @@
 import logging
+import os
 import re
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
+Talisman(
+    app,
+    content_security_policy={
+        "default-src": ["'none'"],
+        "base-uri": ["'self'"],
+        "frame-ancestors": ["'none'"],
+        "object-src": ["'none'"],
+        "script-src": ["'none'"],
+        "connect-src": ["'self'"],
+    },
+    force_https=False,
+)
 limiter = Limiter(key_func=get_remote_address, default_limits=["30 per minute"])
 limiter.init_app(app)
 
@@ -77,6 +94,15 @@ def handle_prompt():
         return jsonify({"error": "Missing or invalid 'prompt' field"}), 400
 
     return jsonify({"sanitized_prompt": prompt})
+
+
+@app.after_request
+def set_security_headers(response):
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "same-origin")
+    response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+    return response
 
 
 if __name__ == "__main__":
