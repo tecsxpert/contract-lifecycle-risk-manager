@@ -1,5 +1,5 @@
 import unittest
-from prompt_tuning import PROMPT_TEMPLATES, REAL_INPUTS, score_prompt, rewrite_prompt, tune_prompts
+from prompt_tuning import PROMPT_TEMPLATES, REAL_INPUTS, TARGET_AVERAGE_SCORE, score_prompt, rewrite_prompt, tune_prompts
 
 
 class PromptTuningTest(unittest.TestCase):
@@ -34,6 +34,15 @@ class PromptTuningTest(unittest.TestCase):
             self.assertIn("average_score", metadata)
             self.assertIn("needs_rewrite", metadata)
             self.assertIn("rewritten_template", metadata)
+
+    def test_prompt_quality_target_is_met(self):
+        results = tune_prompts()
+        for prompt_name, metadata in results.items():
+            self.assertGreaterEqual(
+                metadata["average_score"],
+                TARGET_AVERAGE_SCORE,
+                f"Expected average score >= {TARGET_AVERAGE_SCORE} for {prompt_name}, got {metadata['average_score']}"
+            )
 
     def test_prompt_inputs_contain_no_pii(self):
         pii_markers = ["@", "+1", "(555)", "ssn", "social security", "credit card", "card number"]
