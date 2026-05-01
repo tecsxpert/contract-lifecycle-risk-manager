@@ -37,14 +37,57 @@ public class ContractService {
      */
     @CacheEvict(value = "contracts", allEntries = true)
     public Contract createContract(Contract contract) {
-        if (contract.getContractName() == null || contract.getContractName().trim().isEmpty()) {
+        validateContractName(contract.getContractName());
+        validateFileName(contract.getFileName());
+        return contractRepository.save(contract);
+    }
+
+    private void validateContractName(String contractName) {
+        if (contractName == null || contractName.trim().isEmpty()) {
             throw new InvalidContractException("Contract name cannot be empty");
         }
+        validateInjectionPatterns(contractName, "contract name");
+    }
 
-        if (contract.getFileName() == null || contract.getFileName().trim().isEmpty()) {
+    private void validateFileName(String fileName) {
+        if (fileName == null || fileName.trim().isEmpty()) {
             throw new InvalidContractException("File name is required");
         }
+        validateInjectionPatterns(fileName, "file name");
+    }
 
-        return contractRepository.save(contract);
+    private void validateInjectionPatterns(String value, String fieldName) {
+        String normalized = value.trim().toLowerCase();
+        if (containsSqlInjection(normalized)) {
+            throw new InvalidContractException("Potential SQL injection detected in " + fieldName);
+        }
+        if (containsPromptInjection(normalized)) {
+            throw new InvalidContractException("Potential prompt injection detected in " + fieldName);
+        }
+    }
+
+    private boolean containsSqlInjection(String value) {
+        return value.contains("select ")
+                || value.contains("union ")
+                || value.contains("drop ")
+                || value.contains("insert ")
+                || value.contains("delete ")
+                || value.contains("update ")
+                || value.contains("--")
+                || value.contains(";")
+                || value.contains("' or ")
+                || value.contains("\" or ");
+    }
+
+    private boolean containsPromptInjection(String value) {
+        return value.contains("ignore previous")
+                || value.contains("ignore all")
+                || value.contains("disregard previous")
+                || value.contains("disregard all")
+                || value.contains("do not follow instructions")
+                || value.contains("dont follow instructions")
+                || value.contains("forget previous")
+                || value.contains("bypass security")
+                || value.contains("prompt injection");
     }
 }

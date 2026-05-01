@@ -1,0 +1,7 @@
+requests
+python-dotenv
+flask
+flask-limiter
+flask-cors
+flask-talisman
+pytest

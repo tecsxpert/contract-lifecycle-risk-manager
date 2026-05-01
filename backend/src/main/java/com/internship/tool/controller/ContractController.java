@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/contracts")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // Supports local development with Frontend Dev 2
+@CrossOrigin(origins = "http://localhost:3000") // Restrict CORS for local development
 public class ContractController {
 
     private final ContractService contractService;
