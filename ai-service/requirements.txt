@@ -1,1 +1,4 @@
-﻿requests\npython-dotenv\n
+requests
+python-dotenv
+flask
+flask-limiter
