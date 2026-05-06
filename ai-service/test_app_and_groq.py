@@ -52,6 +52,34 @@ def test_prompt_endpoint_rejects_html_injection(client):
     assert response.get_json()["sanitized_prompt"] == "alert('bad')Clean this."
 
 
+def test_health_endpoint_returns_ok(client):
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.get_json()["status"] == "ok"
+
+
+def test_recommend_endpoint_returns_recommendation(client):
+    response = client.post(
+        "/api/recommend",
+        json={"prompt": "This contract includes risk and payment terms."},
+    )
+    assert response.status_code == 200
+    assert response.is_json
+    assert "recommendation" in response.get_json()
+
+
+def test_report_endpoint_returns_report(client):
+    response = client.post(
+        "/api/report",
+        json={"prompt": "Review confidentiality and vendor obligations."},
+    )
+    assert response.status_code == 200
+    assert response.is_json
+    assert "report" in response.get_json()
+    assert "Contract report" in response.get_json()["report"]
+
+
 def test_groq_client_fetch_models_success(monkeypatch):
     class DummyResponse:
         status_code = 200
