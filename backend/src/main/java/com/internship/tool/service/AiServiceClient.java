@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,11 +26,7 @@ public class AiServiceClient {
     private final RestTemplate restTemplate;
     private final String baseUrl;
 
-    public AiServiceClient() {
-        this(DEFAULT_BASE_URL);
-    }
-
-    public AiServiceClient(String baseUrl) {
+    public AiServiceClient(@Value("${AI_SERVICE_BASE_URL:http://localhost:5000}") String baseUrl) {
         this.baseUrl = baseUrl;
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(TIMEOUT_MILLIS);
