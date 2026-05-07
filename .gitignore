@@ -1,10 +1,11 @@
 .env
 target/
 node_modules/
-__pycache/
+__pycache__/
 .idea/
 .vscode/
 *.class
 .mvn/
 mvnw
 mvnw.cmd
+venv/

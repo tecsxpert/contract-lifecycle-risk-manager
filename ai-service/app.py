@@ -8,12 +8,27 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+from routes.health import health_bp
+from routes.describe import describe_bp
+from routes.recommend import recommend_bp
+from routes.report import report_bp
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s"
+)
+
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
+
+allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000"
+).split(",")
+
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
+
 Talisman(
     app,
     content_security_policy={
@@ -26,7 +41,12 @@ Talisman(
     },
     force_https=False,
 )
-limiter = Limiter(key_func=get_remote_address, default_limits=["30 per minute"])
+
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["30 per minute"]
+)
+
 limiter.init_app(app)
 
 INJECTION_PATTERNS = [
@@ -50,37 +70,61 @@ def strip_html(value: str) -> str:
 
 
 def contains_prompt_injection(value: str) -> bool:
+
     lowered = value.lower()
+
     for pattern in INJECTION_PATTERNS:
         if re.search(pattern, lowered):
             return True
+
     return False
 
 
 def sanitize_value(value):
+
     if isinstance(value, str):
         return strip_html(value)
+
     if isinstance(value, dict):
-        return {key: sanitize_value(val) for key, val in value.items()}
+        return {
+            key: sanitize_value(val)
+            for key, val in value.items()
+        }
+
     if isinstance(value, list):
-        return [sanitize_value(item) for item in value]
+        return [
+            sanitize_value(item)
+            for item in value
+        ]
+
     return value
 
 
 @app.before_request
 def sanitize_request_payload():
+
     if request.method not in ("POST", "PUT", "PATCH"):
         return
 
     payload = request.get_json(silent=True)
+
     if payload is None:
         return
 
     sanitized = sanitize_value(payload)
+
     payload_text = str(sanitized)
+
     if contains_prompt_injection(payload_text):
-        logger.warning("Prompt injection detected: %s", payload_text)
-        return jsonify({"error": "prompt injection detected"}), 400
+
+        logger.warning(
+            "Prompt injection detected: %s",
+            payload_text
+        )
+
+        return jsonify({
+            "error": "prompt injection detected"
+        }), 400
 
     request.environ["sanitized_json"] = sanitized
 
@@ -88,21 +132,55 @@ def sanitize_request_payload():
 @app.route("/api/prompt", methods=["POST"])
 @limiter.limit("30 per minute")
 def handle_prompt():
-    payload = request.environ.get("sanitized_json") or request.get_json(silent=True) or {}
-    prompt = payload.get("prompt")
-    if not prompt or not isinstance(prompt, str):
-        return jsonify({"error": "Missing or invalid 'prompt' field"}), 400
 
-    return jsonify({"sanitized_prompt": prompt})
+    payload = (
+        request.environ.get("sanitized_json")
+        or request.get_json(silent=True)
+        or {}
+    )
+
+    prompt = payload.get("prompt")
+
+    if not prompt or not isinstance(prompt, str):
+        return jsonify({
+            "error": "Missing or invalid 'prompt' field"
+        }), 400
+
+    return jsonify({
+        "sanitized_prompt": prompt
+    })
 
 
 @app.after_request
 def set_security_headers(response):
-    response.headers.setdefault("X-Content-Type-Options", "nosniff")
-    response.headers.setdefault("X-Frame-Options", "DENY")
-    response.headers.setdefault("Referrer-Policy", "same-origin")
-    response.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+
+    response.headers.setdefault(
+        "X-Content-Type-Options",
+        "nosniff"
+    )
+
+    response.headers.setdefault(
+        "X-Frame-Options",
+        "DENY"
+    )
+
+    response.headers.setdefault(
+        "Referrer-Policy",
+        "same-origin"
+    )
+
+    response.headers.setdefault(
+        "Permissions-Policy",
+        "geolocation=(), microphone=(), camera=()"
+    )
+
     return response
+
+
+app.register_blueprint(health_bp)
+app.register_blueprint(describe_bp)
+app.register_blueprint(recommend_bp)
+app.register_blueprint(report_bp)
 
 
 if __name__ == "__main__":
