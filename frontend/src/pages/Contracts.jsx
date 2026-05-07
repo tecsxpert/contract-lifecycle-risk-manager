@@ -19,17 +19,15 @@ function Contracts() {
 
   const { token } = useContext(AuthContext);
 
-  // 🔹 Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
-      setPage(0); // reset page on search
+      setPage(0);
     }, 500);
 
     return () => clearTimeout(timer);
   }, [query]);
 
-  // 🔹 Fetch data
   useEffect(() => {
     fetchContracts();
   }, [page, debouncedQuery, status, startDate, endDate]);
@@ -52,7 +50,6 @@ function Contracts() {
     }
   };
 
-  // 🔹 Delete
   const handleDelete = async (id) => {
     try {
       await api.delete(`/contracts/${id}`, {
@@ -66,7 +63,6 @@ function Contracts() {
     }
   };
 
-  // 🔹 Export CSV
   const handleExport = async () => {
     try {
       const res = await api.get("/contracts/export", {
@@ -90,48 +86,42 @@ function Contracts() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-7xl mx-auto">
       <h1 className="text-xl font-bold mb-4">Contracts</h1>
-
-      {/* 🔹 NAV BUTTONS */}
-      <div className="mb-4">
+      <div className="mb-4 flex flex-col md:flex-row gap-2">
         <Link to="/dashboard">
-          <button className="bg-purple-500 text-white px-4 py-2 mr-2">
+          <button className="bg-purple-500 text-white px-4 py-2 w-full md:w-auto">
             Dashboard
           </button>
         </Link>
 
         <Link to="/create">
-          <button className="bg-blue-500 text-white px-4 py-2 mr-2">
+          <button className="bg-blue-500 text-white px-4 py-2 w-full md:w-auto">
             Create Contract
           </button>
         </Link>
 
         <button
           onClick={handleExport}
-          className="bg-green-600 text-white px-4 py-2"
+          className="bg-green-600 text-white px-4 py-2 w-full md:w-auto"
         >
           Export CSV
         </button>
       </div>
-
-      {/* 🔹 FILE UPLOAD */}
       <div className="mb-4">
         <FileUpload />
       </div>
-
-      {/* 🔍 SEARCH + FILTERS */}
-      <div className="mb-4 flex gap-2 flex-wrap">
+      <div className="mb-4 flex flex-col md:flex-row gap-2 flex-wrap">
         <input
           type="text"
           placeholder="Search..."
-          className="border p-2"
+          className="border p-2 w-full md:w-auto"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
 
         <select
-          className="border p-2"
+          className="border p-2 w-full md:w-auto"
           value={status}
           onChange={(e) => {
             setStatus(e.target.value);
@@ -146,7 +136,7 @@ function Contracts() {
 
         <input
           type="date"
-          className="border p-2"
+          className="border p-2 w-full md:w-auto"
           value={startDate}
           onChange={(e) => {
             setStartDate(e.target.value);
@@ -156,7 +146,7 @@ function Contracts() {
 
         <input
           type="date"
-          className="border p-2"
+          className="border p-2 w-full md:w-auto"
           value={endDate}
           onChange={(e) => {
             setEndDate(e.target.value);
@@ -164,58 +154,59 @@ function Contracts() {
           }}
         />
       </div>
-
-      {/* 📊 TABLE */}
       {contracts.length === 0 ? (
         <p className="text-gray-500">No contracts found</p>
       ) : (
         <>
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="p-2 border">Title</th>
-                <th className="p-2 border">Status</th>
-                <th className="p-2 border">Risk</th>
-                <th className="p-2 border">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {contracts.map((c) => (
-                <tr key={c.id}>
-                  <td className="p-2 border">
-                    <Link
-                      to={`/contracts/${c.id}`}
-                      className="text-blue-600 underline"
-                    >
-                      {c.title}
-                    </Link>
-                  </td>
-
-                  <td className="p-2 border">{c.status}</td>
-                  <td className="p-2 border">{c.risk_level}</td>
-
-                  <td className="p-2 border">
-                    <button
-                      className="bg-red-500 text-white px-2 py-1 mr-2"
-                      onClick={() => handleDelete(c.id)}
-                    >
-                      Delete
-                    </button>
-
-                    <Link to={`/edit/${c.id}`}>
-                      <button className="bg-yellow-500 text-white px-2 py-1">
-                        Edit
-                      </button>
-                    </Link>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full border text-sm md:text-base">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="p-2 border">Title</th>
+                  <th className="p-2 border">Status</th>
+                  <th className="p-2 border hidden md:table-cell">Risk</th>
+                  <th className="p-2 border">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
 
-          {/* 🔄 PAGINATION */}
-          <div className="mt-4">
+              <tbody>
+                {contracts.map((c) => (
+                  <tr key={c.id}>
+                    <td className="p-2 border">
+                      <Link
+                        to={`/contracts/${c.id}`}
+                        className="text-blue-600 underline"
+                      >
+                        {c.title}
+                      </Link>
+                    </td>
+
+                    <td className="p-2 border">{c.status}</td>
+
+                    <td className="p-2 border hidden md:table-cell">
+                      {c.risk_level}
+                    </td>
+
+                    <td className="p-2 border">
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 mr-2"
+                        onClick={() => handleDelete(c.id)}
+                      >
+                        Delete
+                      </button>
+
+                      <Link to={`/edit/${c.id}`}>
+                        <button className="bg-yellow-500 text-white px-2 py-1">
+                          Edit
+                        </button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 flex justify-center md:justify-start">
             <button
               className="bg-gray-300 px-3 py-1 mr-2"
               disabled={page === 0}
