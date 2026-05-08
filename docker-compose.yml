@@ -9,9 +9,54 @@ services:
       POSTGRES_DB: tool71
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tool71"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
     container_name: tool71-redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ai-service:
+    build:
+      context: ./ai-service
+    container_name: tool71-ai-service
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+    depends_on:
+      - db
+      - redis
+
+  backend:
+    build:
+      context: ./backend
+    container_name: tool71-backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: tool71
+      DB_USER: postgres
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      AI_SERVICE_BASE_URL: http://ai-service:5000
+      JWT_SECRET: 638E1AF29432364B39527D6A4C1FE251DE9E5C19A627D6A4C1FE251DE9E5C19
+    depends_on:
+      - db
+      - redis
+      - ai-service
