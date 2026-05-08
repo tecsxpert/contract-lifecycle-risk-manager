@@ -1,0 +1,30 @@
+Contract contains unclear payment terms indicating possible financial dispute.
+Delay in contract approval process indicating possible project timeline risk.
+Vendor failed to meet SLA standards indicating possible service failure risk.
+Contract missing penalty clause indicating possible non-compliance risk.
+Frequent scope changes requested indicating possible scope creep risk.
+Unclear termination conditions indicating possible legal conflict risk.
+Contract renewal date approaching indicating possible continuity risk.
+Supplier dependency on single source indicating possible supply chain risk.
+Incomplete contract documentation indicating possible audit risk.
+Late delivery history of vendor indicating possible operational risk.
+Unverified vendor credentials indicating possible fraud risk.
+High contract value without insurance coverage indicating financial exposure risk.
+Contract contains ambiguous liability clause indicating possible legal risk.
+Missing confidentiality clause indicating possible data leakage risk.
+Unauthorized contract modification detected indicating governance risk.
+Delay in milestone completion indicating performance risk.
+Contract signed without legal review indicating compliance risk.
+Vendor requesting advance payment indicating possible financial risk.
+Dispute raised by client indicating possible relationship risk.
+Contract contains outdated pricing terms indicating revenue loss risk.
+Failure to meet regulatory standards indicating compliance violation risk.
+High employee turnover in vendor team indicating service disruption risk.
+Data sharing with third parties indicating privacy risk.
+Contract missing intellectual property clause indicating ownership risk.
+Contract obligations not tracked indicating delivery failure risk.
+Frequent invoice mismatches indicating billing dispute risk.
+Service downtime reported repeatedly indicating SLA breach risk.
+Contract contains unclear jurisdiction clause indicating legal enforcement risk.
+Vendor financial instability detected indicating bankruptcy risk.
+Unapproved subcontracting detected indicating quality and security risk.
